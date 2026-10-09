@@ -14,11 +14,12 @@ export default function App() {
 
   const fetchCharacters = async () => {
     try {
-      const response = await fetch('https://rickandmortyapi.com/api/character');
+      // Endpoint público de Harry Potter para obtener personajes
+      const response = await fetch('https://hp-api.onrender.com/api/characters');
       const data = await response.json();
-      setCharacters(data.results);
+      setCharacters(data);
     } catch (error) {
-      console.error('Error al obtener los datos:', error);
+      console.error('Error al obtener los datos de Hogwarts:', error);
     } finally {
       setIsLoading(false);
     }
@@ -28,14 +29,19 @@ export default function App() {
     fetchCharacters();
   }, []);
 
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case 'Alive':
-        return styles.statusAlive;
-      case 'Dead':
-        return styles.statusDead;
+  // Función para asignar colores según la casa de Hogwarts
+  const getHouseStyle = (house) => {
+    switch (house) {
+      case 'Gryffindor':
+        return styles.houseGryffindor;
+      case 'Slytherin':
+        return styles.houseSlytherin;
+      case 'Ravenclaw':
+        return styles.houseRavenclaw;
+      case 'Hufflepuff':
+        return styles.houseHufflepuff;
       default:
-        return styles.statusUnknown;
+        return styles.houseUnknown;
     }
   };
 
@@ -43,32 +49,35 @@ export default function App() {
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
-        <Text style={styles.title}>Rick & Morty API por OLAD</Text>
-        <Text style={styles.subtitle}>Personajes obtenidos con fetch()</Text>
+        <Text style={styles.title}>Harry Potter API por OLAD</Text>
+        <Text style={styles.subtitle}>Personajes del Mundo Mágico</Text>
       </View>
 
       {isLoading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#97ce4c" />
-          <Text style={styles.loadingText}>Cargando del Multiverso...</Text>
+          <ActivityIndicator size="large" color="#e3af34" />
+          <Text style={styles.loadingText}>Abriendo el Mapa Merodeador...</Text>
         </View>
       ) : (
         <FlatList
           data={characters}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Image source={{ uri: item.image }} style={styles.avatar} />
+              <Image 
+                source={{ uri: item.image || 'https://via.placeholder.com/90' }} 
+                style={styles.avatar} 
+              />
               
               <View style={styles.infoContainer}>
                 <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-                <Text style={styles.detailText}>Especie: {item.species}</Text>
+                <Text style={styles.detailText}>Casa: {item.house || 'Desconocida'}</Text>
                 
                 <View style={styles.statusContainer}>
-                  <View style={[styles.statusDot, getStatusStyle(item.status)]} />
+                  <View style={[styles.statusDot, getHouseStyle(item.house)]} />
                   <Text style={styles.statusText}>
-                    {item.status} - {item.gender}
+                    {item.alive ? 'Vivo' : 'Fallecido'} {item.patronus ? `- Patronus: ${item.patronus}` : ''}
                   </Text>
                 </View>
               </View>
